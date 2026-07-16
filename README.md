@@ -70,9 +70,13 @@ python ads_gui.py
 
 Sie verbindet sich beim Start automatisch, zeigt den Verbindungsstatus sowie
 die aktuellen SPS-Werte von Key, Beschreiben und Schreiben an (aktualisiert
-sich jede Sekunde), und lässt Key/Beschreiben über Eingabefelder setzen. Der
-Button "Schreiben" muss gedrückt gehalten werden – beim Loslassen wird
-`gv_Benutzerverwaltung.Schreiben` automatisch wieder auf `False` gesetzt.
+sich jede Sekunde), und bietet zwei getrennte Buttons:
+
+- **Übernehmen** – schreibt die Eingabefelder Key/Beschreiben auf einen Klick
+  in die SPS.
+- **Schreiben (gedrückt halten)** – setzt `gv_Benutzerverwaltung.Schreiben`
+  auf `True` solange der Button gedrückt gehalten wird, und beim Loslassen
+  automatisch wieder auf `False`.
 
 tkinter ist Teil der Standard-Python-Installation von python.org, es wird
 keine zusätzliche Bibliothek benötigt. Falls beim Start ein Fehler wie

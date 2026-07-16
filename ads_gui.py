@@ -62,9 +62,16 @@ class App(tk.Tk):
             row=1, column=1, sticky="ew", padx=4, pady=4
         )
 
+        self.submit_btn = ttk.Button(
+            input_frame, text="Übernehmen", command=self._on_submit
+        )
+        self.submit_btn.grid(
+            row=2, column=0, columnspan=2, sticky="ew", padx=4, pady=(8, 4)
+        )
+
         self.write_btn = ttk.Button(input_frame, text="Schreiben (gedrückt halten)")
         self.write_btn.grid(
-            row=2, column=0, columnspan=2, sticky="ew", padx=4, pady=(8, 4)
+            row=3, column=0, columnspan=2, sticky="ew", padx=4, pady=(4, 4)
         )
         self.write_btn.bind("<ButtonPress-1>", self._on_press)
         self.write_btn.bind("<ButtonRelease-1>", self._on_release)
@@ -109,7 +116,9 @@ class App(tk.Tk):
         except Exception:
             self.connected = False
             self._set_status("Keine Verbindung – erneuter Versuch...", ok=False)
-        self.write_btn.state(["!disabled"] if self.connected else ["disabled"])
+        state = ["!disabled"] if self.connected else ["disabled"]
+        self.submit_btn.state(state)
+        self.write_btn.state(state)
 
     def _refresh(self):
         try:
@@ -125,24 +134,32 @@ class App(tk.Tk):
                     "Ja" if values[VAR_SCHREIBEN] else "Nein"
                 )
                 self._set_status("Verbunden", ok=True)
+                self.submit_btn.state(["!disabled"])
                 self.write_btn.state(["!disabled"])
         except Exception:
             self.connected = False
             self._set_status("Keine Verbindung – erneuter Versuch...", ok=False)
+            self.submit_btn.state(["disabled"])
             self.write_btn.state(["disabled"])
         finally:
             self.after(1000, self._refresh)
 
-    def _on_press(self, event):
+    def _on_submit(self):
         key = self.key_var.get()[:MAX_STRING_LEN]
         beschreiben = self.beschreiben_var.get()[:MAX_STRING_LEN]
-        self._writing = True
         try:
             self.plc.write_list_by_name({
                 VAR_KEY: key,
                 VAR_BESCHREIBEN: beschreiben,
-                VAR_SCHREIBEN: True,
             })
+        except Exception:
+            self.connected = False
+            self._set_status("Schreibfehler – erneuter Versuch...", ok=False)
+
+    def _on_press(self, event):
+        self._writing = True
+        try:
+            self.plc.write_by_name(VAR_SCHREIBEN, True, pyads.PLCTYPE_BOOL)
         except Exception:
             self.connected = False
             self._set_status("Schreibfehler – erneuter Versuch...", ok=False)
