@@ -73,22 +73,13 @@ class App(tk.Tk):
         input_frame.pack(fill="x", padx=10, pady=4)
         input_frame.columnconfigure(1, weight=1)
 
-        self.key_var = tk.StringVar()
         self.beschreiben_var = tk.StringVar()
 
-        ttk.Label(input_frame, text="Key:").grid(
+        ttk.Label(input_frame, text="Beschreiben:").grid(
             row=0, column=0, sticky="w", padx=4, pady=4
         )
-        key_entry = ttk.Entry(input_frame, textvariable=self.key_var)
-        key_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
-        key_entry.bind("<FocusIn>", lambda event: open_touch_keyboard())
-        key_entry.bind("<Button-1>", lambda event: open_touch_keyboard())
-
-        ttk.Label(input_frame, text="Beschreiben:").grid(
-            row=1, column=0, sticky="w", padx=4, pady=4
-        )
         beschreiben_entry = ttk.Entry(input_frame, textvariable=self.beschreiben_var)
-        beschreiben_entry.grid(row=1, column=1, sticky="ew", padx=4, pady=4)
+        beschreiben_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
         beschreiben_entry.bind("<FocusIn>", lambda event: open_touch_keyboard())
         beschreiben_entry.bind("<Button-1>", lambda event: open_touch_keyboard())
 
@@ -96,12 +87,12 @@ class App(tk.Tk):
             input_frame, text="Übernehmen", command=self._on_submit
         )
         self.submit_btn.grid(
-            row=2, column=0, columnspan=2, sticky="ew", padx=4, pady=(8, 4)
+            row=1, column=0, columnspan=2, sticky="ew", padx=4, pady=(8, 4)
         )
 
         self.write_btn = ttk.Button(input_frame, text="Schreiben (gedrückt halten)")
         self.write_btn.grid(
-            row=3, column=0, columnspan=2, sticky="ew", padx=4, pady=(4, 4)
+            row=2, column=0, columnspan=2, sticky="ew", padx=4, pady=(4, 4)
         )
         self.write_btn.bind("<ButtonPress-1>", self._on_press)
         self.write_btn.bind("<ButtonRelease-1>", self._on_release)
@@ -175,13 +166,9 @@ class App(tk.Tk):
             self.after(1000, self._refresh)
 
     def _on_submit(self):
-        key = self.key_var.get()[:MAX_STRING_LEN]
         beschreiben = self.beschreiben_var.get()[:MAX_STRING_LEN]
         try:
-            self.plc.write_list_by_name({
-                VAR_KEY: key,
-                VAR_BESCHREIBEN: beschreiben,
-            })
+            self.plc.write_by_name(VAR_BESCHREIBEN, beschreiben, pyads.PLCTYPE_STRING)
         except Exception:
             self.connected = False
             self._set_status("Schreibfehler – erneuter Versuch...", ok=False)

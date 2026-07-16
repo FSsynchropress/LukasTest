@@ -72,16 +72,16 @@ Sie verbindet sich beim Start automatisch, zeigt den Verbindungsstatus sowie
 die aktuellen SPS-Werte von Key, Beschreiben und Schreiben an (aktualisiert
 sich jede Sekunde), und bietet zwei getrennte Buttons:
 
-- **Übernehmen** – schreibt die Eingabefelder Key/Beschreiben auf einen Klick
-  in die SPS.
+- **Übernehmen** – schreibt das Eingabefeld Beschreiben auf einen Klick in
+  die SPS. Key ist nur in der Live-Anzeige zu sehen, nicht editierbar.
 - **Schreiben (gedrückt halten)** – setzt `gv_Benutzerverwaltung.Schreiben`
   auf `True` solange der Button gedrückt gehalten wird, und beim Loslassen
   automatisch wieder auf `False`.
 
-Beim Antippen von Key oder Beschreiben öffnet sich automatisch die
-klassische Windows-Bildschirmtastatur (`osk.exe`) – praktisch bei
-Touch-Bedienung ohne physische Tastatur. Sie ist Teil jeder
-Windows-Edition (auch LTSC) und benötigt keine zusätzliche Bibliothek.
+Beim Antippen von Beschreiben öffnet sich automatisch die klassische
+Windows-Bildschirmtastatur (`osk.exe`) – praktisch bei Touch-Bedienung ohne
+physische Tastatur. Sie ist Teil jeder Windows-Edition (auch LTSC) und
+benötigt keine zusätzliche Bibliothek.
 
 tkinter ist Teil der Standard-Python-Installation von python.org, es wird
 keine zusätzliche Bibliothek benötigt. Falls beim Start ein Fehler wie
