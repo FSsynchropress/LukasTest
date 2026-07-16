@@ -58,8 +58,9 @@ def open_touch_keyboard():
             clsctx=comtypes.CLSCTX_LOCAL_SERVER,
         )
         obj.Toggle(_user32.GetForegroundWindow())
-    except Exception:
-        pass  # keine Bildschirmtastatur verfügbar – Feld bleibt trotzdem nutzbar
+    except Exception as exc:
+        # Feld bleibt trotzdem nutzbar; Fehler zur Diagnose auf der Konsole ausgeben
+        print(f"Bildschirmtastatur konnte nicht geöffnet werden: {exc}")
 
 
 class App(tk.Tk):
@@ -96,6 +97,7 @@ class App(tk.Tk):
         key_entry = ttk.Entry(input_frame, textvariable=self.key_var)
         key_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
         key_entry.bind("<FocusIn>", lambda event: open_touch_keyboard())
+        key_entry.bind("<Button-1>", lambda event: open_touch_keyboard())
 
         ttk.Label(input_frame, text="Beschreiben:").grid(
             row=1, column=0, sticky="w", padx=4, pady=4
@@ -103,6 +105,7 @@ class App(tk.Tk):
         beschreiben_entry = ttk.Entry(input_frame, textvariable=self.beschreiben_var)
         beschreiben_entry.grid(row=1, column=1, sticky="ew", padx=4, pady=4)
         beschreiben_entry.bind("<FocusIn>", lambda event: open_touch_keyboard())
+        beschreiben_entry.bind("<Button-1>", lambda event: open_touch_keyboard())
 
         self.submit_btn = ttk.Button(
             input_frame, text="Übernehmen", command=self._on_submit
