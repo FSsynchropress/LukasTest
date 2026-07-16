@@ -1,1 +1,2 @@
 pyads>=3.4.0
+comtypes>=1.2.0

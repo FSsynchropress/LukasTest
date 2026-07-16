@@ -4,12 +4,15 @@ Grafische Oberfläche zum Lesen und Schreiben der SPS-Variablen
 der Benutzerverwaltung. Läuft lokal auf dem IPC.
 """
 
-import os
-import subprocess
 import tkinter as tk
 from tkinter import ttk
 
 import pyads
+
+import comtypes
+from comtypes import GUID, COMMETHOD, IUnknown
+from ctypes import windll
+from ctypes.wintypes import HWND, HRESULT
 
 AMS_NET_ID = "192.168.244.20.1.1"
 ADS_PORT   = pyads.PORT_TC3PLC1  # 851
@@ -22,10 +25,41 @@ VAR_SCHREIBEN   = "gv_Benutzerverwaltung.Schreiben"
 # als STRING(n) mit anderer Länge deklariert sind.
 MAX_STRING_LEN = 80
 
-# Windows-10-Bildschirmtastatur (Touch-Bedienung ohne physische Tastatur)
-TABTIP_PATH = os.path.expandvars(
-    r"%CommonProgramFiles%\microsoft shared\ink\TabTip.exe"
-)
+# ── Windows-Bildschirmtastatur (Touch-Bedienung ohne physische Tastatur) ──────
+# TabTip.exe direkt per subprocess zu starten öffnet die Tastatur unter
+# Windows 10 zuverlässig NICHT – Windows blendet sie nur ein, wenn sie über
+# die COM-Schnittstelle ITipInvocation angestoßen wird (undokumentiert, aber
+# stabil, seit Windows 8 in Gebrauch).
+_user32 = windll.user32
+
+_CLSID_UIHostNoLaunch = GUID("{4CE576FA-83DC-4F88-951C-9D0782B4E376}")
+
+
+class _ITipInvocation(IUnknown):
+    _iid_ = GUID("{37c994e7-432b-4834-a2f7-dce1f13b834b}")
+    _methods_ = [
+        COMMETHOD([], HRESULT, "Toggle", (["in"], HWND, "hwnd")),
+    ]
+
+
+def _touch_keyboard_visible():
+    return _user32.FindWindowW("IPTip_Main_Window", None) != 0
+
+
+def open_touch_keyboard():
+    """Öffnet die Windows-Bildschirmtastatur, falls sie nicht schon sichtbar ist."""
+    if _touch_keyboard_visible():
+        return
+    try:
+        comtypes.CoInitialize()
+        obj = comtypes.CoCreateInstance(
+            _CLSID_UIHostNoLaunch,
+            interface=_ITipInvocation,
+            clsctx=comtypes.CLSCTX_LOCAL_SERVER,
+        )
+        obj.Toggle(_user32.GetForegroundWindow())
+    except Exception:
+        pass  # keine Bildschirmtastatur verfügbar – Feld bleibt trotzdem nutzbar
 
 
 class App(tk.Tk):
@@ -61,14 +95,14 @@ class App(tk.Tk):
         )
         key_entry = ttk.Entry(input_frame, textvariable=self.key_var)
         key_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
-        key_entry.bind("<FocusIn>", self._open_touch_keyboard)
+        key_entry.bind("<FocusIn>", lambda event: open_touch_keyboard())
 
         ttk.Label(input_frame, text="Beschreiben:").grid(
             row=1, column=0, sticky="w", padx=4, pady=4
         )
         beschreiben_entry = ttk.Entry(input_frame, textvariable=self.beschreiben_var)
         beschreiben_entry.grid(row=1, column=1, sticky="ew", padx=4, pady=4)
-        beschreiben_entry.bind("<FocusIn>", self._open_touch_keyboard)
+        beschreiben_entry.bind("<FocusIn>", lambda event: open_touch_keyboard())
 
         self.submit_btn = ttk.Button(
             input_frame, text="Übernehmen", command=self._on_submit
@@ -110,12 +144,6 @@ class App(tk.Tk):
         ttk.Label(live_frame, textvariable=self.live_schreiben_var).grid(
             row=2, column=1, sticky="w", padx=4, pady=(2, 8)
         )
-
-    def _open_touch_keyboard(self, event=None):
-        try:
-            subprocess.Popen([TABTIP_PATH])
-        except Exception:
-            pass  # keine Bildschirmtastatur verfügbar – Feld bleibt trotzdem nutzbar
 
     def _set_status(self, text, ok):
         self.status_var.set(text)
