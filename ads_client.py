@@ -17,8 +17,12 @@ def main():
 
     try:
         # ── Lesen ──────────────────────────────────────────────────────────
-        wert = plc.read_by_name("gv_Benutzerverwaltung.Schreiben", pyads.PLCTYPE_BOOL)
-        print(f"gv_Benutzerverwaltung.Schreiben = {wert}")
+wert = plc.read_by_name("gv_Benutzerverwaltung.Schreiben", pyads.PLCTYPE_BOOL)
+wert1 = plc.read_by_name("gv_Benutzerverwaltung.Key", pyads.PLCTYPE_STRING)
+wert2 = plc.read_by_name("gv_Benutzerverwaltung.Beschreiben", pyads.PLCTYPE_STRING)
+print(f"gv_Benutzerverwaltung.Schreiben = {wert}")
+print(f"gv_Benutzerverwaltung.Key = {wert1}")
+print(f"gv_Benutzerverwaltung.Beschreiben = {wert2}")
 
         # ── Schreiben (Beispiel) ────────────────────────────────────────────
         # plc.write_by_name("gv_Benutzerverwaltung.Schreiben", True, pyads.PLCTYPE_BOOL)
