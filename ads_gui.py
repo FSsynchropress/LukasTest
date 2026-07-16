@@ -10,9 +10,9 @@ from tkinter import ttk
 import pyads
 
 import comtypes
-from comtypes import GUID, COMMETHOD, IUnknown
+from comtypes import GUID, COMMETHOD, HRESULT, IUnknown
 from ctypes import windll
-from ctypes.wintypes import HWND, HRESULT
+from ctypes.wintypes import HWND
 
 AMS_NET_ID = "192.168.244.20.1.1"
 ADS_PORT   = pyads.PORT_TC3PLC1  # 851
