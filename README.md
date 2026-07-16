@@ -60,6 +60,25 @@ plc.close()
 plc.write_by_name("MAIN.bEnable", True, pyads.PLCTYPE_BOOL)
 ```
 
+## GUI (Benutzerverwaltung)
+
+Statt der Kommandozeile kann eine grafische Oberfläche verwendet werden:
+
+```bash
+python ads_gui.py
+```
+
+Sie verbindet sich beim Start automatisch, zeigt den Verbindungsstatus sowie
+die aktuellen SPS-Werte von Key, Beschreiben und Schreiben an (aktualisiert
+sich jede Sekunde), und lässt Key/Beschreiben über Eingabefelder setzen. Der
+Button "Schreiben" muss gedrückt gehalten werden – beim Loslassen wird
+`gv_Benutzerverwaltung.Schreiben` automatisch wieder auf `False` gesetzt.
+
+tkinter ist Teil der Standard-Python-Installation von python.org, es wird
+keine zusätzliche Bibliothek benötigt. Falls beim Start ein Fehler wie
+`No module named tkinter` erscheint: den Python-Installer erneut ausführen,
+"Modify" wählen und sicherstellen, dass "tcl/tk and IDLE" aktiviert ist.
+
 ### Unterstützte Datentypen
 
 | pyads-Typ            | SPS-Typ   |
