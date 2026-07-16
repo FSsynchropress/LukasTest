@@ -78,6 +78,11 @@ sich jede Sekunde), und bietet zwei getrennte Buttons:
   auf `True` solange der Button gedrückt gehalten wird, und beim Loslassen
   automatisch wieder auf `False`.
 
+Beim Antippen von Key oder Beschreiben öffnet sich automatisch die
+eingebaute Windows-Bildschirmtastatur (`TabTip.exe`) – praktisch bei
+Touch-Bedienung ohne physische Tastatur. Falls sie nicht erscheint, prüfen
+ob unter Windows die "Tablet-PC-Komponenten" aktiviert sind.
+
 tkinter ist Teil der Standard-Python-Installation von python.org, es wird
 keine zusätzliche Bibliothek benötigt. Falls beim Start ein Fehler wie
 `No module named tkinter` erscheint: den Python-Installer erneut ausführen,

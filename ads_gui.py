@@ -4,6 +4,8 @@ Grafische Oberfläche zum Lesen und Schreiben der SPS-Variablen
 der Benutzerverwaltung. Läuft lokal auf dem IPC.
 """
 
+import os
+import subprocess
 import tkinter as tk
 from tkinter import ttk
 
@@ -19,6 +21,11 @@ VAR_SCHREIBEN   = "gv_Benutzerverwaltung.Schreiben"
 # Standard-TwinCAT-STRING-Größe (80 Zeichen); anpassen falls Key/Beschreiben
 # als STRING(n) mit anderer Länge deklariert sind.
 MAX_STRING_LEN = 80
+
+# Windows-10-Bildschirmtastatur (Touch-Bedienung ohne physische Tastatur)
+TABTIP_PATH = os.path.expandvars(
+    r"%CommonProgramFiles%\microsoft shared\ink\TabTip.exe"
+)
 
 
 class App(tk.Tk):
@@ -52,15 +59,16 @@ class App(tk.Tk):
         ttk.Label(input_frame, text="Key:").grid(
             row=0, column=0, sticky="w", padx=4, pady=4
         )
-        ttk.Entry(input_frame, textvariable=self.key_var).grid(
-            row=0, column=1, sticky="ew", padx=4, pady=4
-        )
+        key_entry = ttk.Entry(input_frame, textvariable=self.key_var)
+        key_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
+        key_entry.bind("<FocusIn>", self._open_touch_keyboard)
+
         ttk.Label(input_frame, text="Beschreiben:").grid(
             row=1, column=0, sticky="w", padx=4, pady=4
         )
-        ttk.Entry(input_frame, textvariable=self.beschreiben_var).grid(
-            row=1, column=1, sticky="ew", padx=4, pady=4
-        )
+        beschreiben_entry = ttk.Entry(input_frame, textvariable=self.beschreiben_var)
+        beschreiben_entry.grid(row=1, column=1, sticky="ew", padx=4, pady=4)
+        beschreiben_entry.bind("<FocusIn>", self._open_touch_keyboard)
 
         self.submit_btn = ttk.Button(
             input_frame, text="Übernehmen", command=self._on_submit
@@ -102,6 +110,12 @@ class App(tk.Tk):
         ttk.Label(live_frame, textvariable=self.live_schreiben_var).grid(
             row=2, column=1, sticky="w", padx=4, pady=(2, 8)
         )
+
+    def _open_touch_keyboard(self, event=None):
+        try:
+            subprocess.Popen([TABTIP_PATH])
+        except Exception:
+            pass  # keine Bildschirmtastatur verfügbar – Feld bleibt trotzdem nutzbar
 
     def _set_status(self, text, ok):
         self.status_var.set(text)
