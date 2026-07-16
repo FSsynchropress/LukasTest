@@ -79,10 +79,9 @@ sich jede Sekunde), und bietet zwei getrennte Buttons:
   automatisch wieder auf `False`.
 
 Beim Antippen von Key oder Beschreiben öffnet sich automatisch die
-eingebaute Windows-Bildschirmtastatur – praktisch bei Touch-Bedienung ohne
-physische Tastatur. Dafür wird zusätzlich `comtypes` benötigt (in
-`requirements.txt` enthalten, `pip install -r requirements.txt` reicht
-also aus).
+klassische Windows-Bildschirmtastatur (`osk.exe`) – praktisch bei
+Touch-Bedienung ohne physische Tastatur. Sie ist Teil jeder
+Windows-Edition (auch LTSC) und benötigt keine zusätzliche Bibliothek.
 
 tkinter ist Teil der Standard-Python-Installation von python.org, es wird
 keine zusätzliche Bibliothek benötigt. Falls beim Start ein Fehler wie

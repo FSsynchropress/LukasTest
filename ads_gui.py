@@ -4,15 +4,12 @@ Grafische Oberfläche zum Lesen und Schreiben der SPS-Variablen
 der Benutzerverwaltung. Läuft lokal auf dem IPC.
 """
 
+import subprocess
 import tkinter as tk
 from tkinter import ttk
+from ctypes import windll
 
 import pyads
-
-import comtypes
-from comtypes import GUID, COMMETHOD, HRESULT, IUnknown
-from ctypes import windll
-from ctypes.wintypes import HWND
 
 AMS_NET_ID = "192.168.244.20.1.1"
 ADS_PORT   = pyads.PORT_TC3PLC1  # 851
@@ -26,24 +23,15 @@ VAR_SCHREIBEN   = "gv_Benutzerverwaltung.Schreiben"
 MAX_STRING_LEN = 80
 
 # ── Windows-Bildschirmtastatur (Touch-Bedienung ohne physische Tastatur) ──────
-# TabTip.exe direkt per subprocess zu starten öffnet die Tastatur unter
-# Windows 10 zuverlässig NICHT – Windows blendet sie nur ein, wenn sie über
-# die COM-Schnittstelle ITipInvocation angestoßen wird (undokumentiert, aber
-# stabil, seit Windows 8 in Gebrauch).
+# Die moderne Touch-Tastatur (TabTip.exe / ITipInvocation) gehört zur
+# "Windows Ink Workspace", die in Windows 10 Enterprise LTSC nicht enthalten
+# ist. osk.exe (die klassische Eingabehilfen-Bildschirmtastatur) ist dagegen
+# Teil jeder Windows-Edition und lässt sich ohne COM-Kniffe direkt starten.
 _user32 = windll.user32
-
-_CLSID_UIHostNoLaunch = GUID("{4CE576FA-83DC-4F88-951C-9D0782B4E376}")
-
-
-class _ITipInvocation(IUnknown):
-    _iid_ = GUID("{37c994e7-432b-4834-a2f7-dce1f13b834b}")
-    _methods_ = [
-        COMMETHOD([], HRESULT, "Toggle", (["in"], HWND, "hwnd")),
-    ]
 
 
 def _touch_keyboard_visible():
-    return _user32.FindWindowW("IPTip_Main_Window", None) != 0
+    return _user32.FindWindowW("OSKMainClass", None) != 0
 
 
 def open_touch_keyboard():
@@ -51,13 +39,7 @@ def open_touch_keyboard():
     if _touch_keyboard_visible():
         return
     try:
-        comtypes.CoInitialize()
-        obj = comtypes.CoCreateInstance(
-            _CLSID_UIHostNoLaunch,
-            interface=_ITipInvocation,
-            clsctx=comtypes.CLSCTX_LOCAL_SERVER,
-        )
-        obj.Toggle(_user32.GetForegroundWindow())
+        subprocess.Popen(["osk.exe"])
     except Exception as exc:
         # Feld bleibt trotzdem nutzbar; Fehler zur Diagnose auf der Konsole ausgeben
         print(f"Bildschirmtastatur konnte nicht geöffnet werden: {exc}")
