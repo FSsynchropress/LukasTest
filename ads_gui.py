@@ -39,7 +39,10 @@ def open_touch_keyboard():
     if _touch_keyboard_visible():
         return
     try:
-        subprocess.Popen(["osk.exe"])
+        # osk.exe direkt zu starten verlangt auf manchen Systemen erhöhte
+        # Rechte (UIAccess-Manifest). Über explorer.exe gestartet läuft es
+        # im richtigen Sicherheitskontext, ohne UAC-Aufforderung.
+        subprocess.Popen(["explorer.exe", r"C:\Windows\System32\osk.exe"])
     except Exception as exc:
         # Feld bleibt trotzdem nutzbar; Fehler zur Diagnose auf der Konsole ausgeben
         print(f"Bildschirmtastatur konnte nicht geöffnet werden: {exc}")
